@@ -1,0 +1,35 @@
+{
+	"db_driver": "postgres",
+    "mssql":	{
+					"pro_db": {
+                        			"host": "localhost",
+                        			"port": 1433,
+                        			"user": "sa",
+                        			"pass": "Secret1234",
+                        			"dbname":"fuf_demo"
+                					},
+					"test_db":{
+                        			"host": "localhost",
+                        			"port": 1433,
+                        			"user": "sa",
+                        			"pass": "Secret1234",
+                        			"dbname":"fuf_demo"
+                					},
+			},
+	"postgres": {	
+					"pro_db": {	
+								"host": "localhost",
+								"port":	5432,
+								"user":	"postgres",
+								"pass":	"postgress",
+								"dbname":"fuf_demo"
+							},
+					"test_db": {
+								"host": "localhost",
+				                 "port": 5432,
+				                 "user": "postgres",
+				                 "pass": "postgress",
+				                 "dbname":"fuf_test"
+						 }
+				}
+}
