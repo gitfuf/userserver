@@ -26,6 +26,7 @@ func InitVars(cfgType, driver string) error {
 
 	setupLogConfig()
 	viper.AddConfigPath("../../config")
+	viper.AddConfigPath("./config")
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
