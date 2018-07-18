@@ -114,6 +114,10 @@ func (myH *MysqlHandler) DeleteUser(id int64) error {
 	return nil
 }
 
+func (myH *MysqlHandler) CloseDB() error {
+	return myH.conn.Close()
+}
+
 //query for create user table
 const myTableUserCreateQuery = `CREATE TABLE IF NOT EXISTS users (
         id INT(10) NOT NULL AUTO_INCREMENT,

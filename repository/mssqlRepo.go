@@ -66,6 +66,14 @@ func (msRepo *MssqlRepo) GetUserInfo(id int64) (usecases.User, error) {
 
 }
 
+func (msRepo *MssqlRepo) CloseDB() {
+	if err := msRepo.msHandler.CloseDB(); err == nil {
+		log.Printf("MssqlRepo: CloseDB() successful")
+	} else {
+		log.Printf("MssqlRepo: CloseDB() err %v\n", err)
+	}
+}
+
 func (msRepo *MssqlRepo) CreateTable(table string) error {
 	log.Println("MssqlRepo:CreateTable ", table)
 	switch table {

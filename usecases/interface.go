@@ -2,9 +2,9 @@ package usecases
 
 type DBRepository interface {
 	UserRepository
-	RoleRepository
 	CreateTable(tableName string) error
 	ClearTable(tableName string) error
+	CloseDB()
 }
 
 type UserRepository interface {
@@ -15,9 +15,6 @@ type UserRepository interface {
 	//SelectAllEmails() ([]string, error)
 }
 
-type RoleRepository interface {
-	AddRole() error
-}
 type User struct {
 	ID        int64  `json:"id"`
 	Age       int    `json:"age"`

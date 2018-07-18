@@ -21,15 +21,32 @@ func main() {
 		os.Exit(3)
 	}
 
-	app := usecases.ServerApp{}
-
 	dbRepo, err := setupDBRepo()
 	if err != nil {
 		log.Fatal(err)
 	}
-	app.DBRepo = dbRepo
-	app.InitRouter()
-	app.Run(":8080")
+	defer dbRepo.CloseDB()
+
+	server, err := usecases.NewServer(dbRepo, ":8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	done := make(chan bool)
+	go func() {
+		log.Println("Run ListenAndServe()")
+		err := server.ListenAndServe()
+		if err != nil {
+			log.Printf("Listen and serve: %v", err)
+		}
+		done <- true
+	}()
+
+	//wait shutdown
+	server.WaitShutdown()
+
+	<-done
+	log.Println("Server was graceful shutdown")
 
 }
 

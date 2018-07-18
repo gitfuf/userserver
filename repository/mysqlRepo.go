@@ -67,6 +67,14 @@ func (myRepo *MysqlRepo) DeleteUser(id int64) error {
 	return nil
 }
 
+func (myRepo *MysqlRepo) CloseDB() {
+	if err := myRepo.myHandler.CloseDB(); err == nil {
+		log.Printf("MysqlRepo: CloseDB() successful")
+	} else {
+		log.Printf("MysqlRepo: CloseDB() err %v\n", err)
+	}
+}
+
 func (myRepo *MysqlRepo) CreateTable(table string) error {
 	log.Println("MysqlRepo:CreateTable ", table)
 	switch table {

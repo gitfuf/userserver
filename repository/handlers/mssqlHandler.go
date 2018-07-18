@@ -103,6 +103,10 @@ func NewMssqlHandler(connString string) (*MsHandler, error) {
 	return MsHandler, nil
 }
 
+func (msH *MsHandler) CloseDB() error {
+	return msH.conn.Close()
+}
+
 //query for create user table
 const msTableUserCreateQuery = `
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')

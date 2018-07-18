@@ -67,6 +67,15 @@ func (pgRepo *PostgresRepo) DeleteUser(id int64) error {
 	return nil
 }
 
+func (pgRepo *PostgresRepo) CloseDB() {
+	if err := pgRepo.pgHandler.CloseDB(); err == nil {
+		log.Printf("PostgresRepo: CloseDB() successful")
+	} else {
+		log.Printf("PostgresRepo: CloseDB() err %v\n", err)
+	}
+
+}
+
 func (pgRepo *PostgresRepo) CreateTable(table string) error {
 	log.Println("PostgresRepo:CreateTable ", table)
 	switch table {

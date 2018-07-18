@@ -18,7 +18,7 @@ type PostgresHandler struct {
 }
 
 func NewPostgresHandler(connString string) (*PostgresHandler, error) {
-	log.Println("call NewPostgresHandler str=", connString)
+	log.Println("call NewPostgresHandler str:", connString)
 	conn, err := sql.Open("postgres", connString) //only check params
 	if err != nil {
 		log.Println("err=", err)
@@ -130,6 +130,10 @@ func (pgH *PostgresHandler) SelectAllEmails() ([]string, error) {
 	return emailList, nil
 }
 */
+
+func (pgH *PostgresHandler) CloseDB() error {
+	return pgH.conn.Close()
+}
 
 //query for create user table
 const pgTableUserCreateQuery = `CREATE TABLE IF NOT EXISTS users
