@@ -1,5 +1,5 @@
 {
-	"db_driver": "postgres",
+	"db_driver": "mysql",
     "mssql":	{
 					"pro_db": {
                         			"host": "localhost",
@@ -31,5 +31,21 @@
 				                 "pass": "postgress",
 				                 "dbname":"fuf_test"
 						 }
-				}
+				},
+	"mysql": {	
+					"pro_db": {	
+								"host": "localhost",
+								"port":	3306,
+								"user":	"root",
+								"pass":	"mysql",
+								"dbname":"fuf_demo"
+							},
+					"test_db": {
+								"host": "localhost",
+				                 "port": 3306,
+				                 "user": "root",
+				                 "pass": "mysql",
+				                 "dbname":"fuf_test"
+						 }
+				}			
 }

@@ -14,10 +14,11 @@ import (
 )
 
 func main() {
-	err := config.InitVars("test", "")
+	//log.Println("PG_HOST=", os.Getenv("PG_HOST"))
+	err := config.InitVars("pro", "")
 	if err != nil {
 		fmt.Println("err=", err)
-		os.Exit(1)
+		os.Exit(3)
 	}
 
 	app := usecases.ServerApp{}
@@ -41,7 +42,7 @@ func setupDBRepo() (usecases.DBRepository, error) {
 	case "postgres":
 		postgresHandler, err := handlers.NewPostgresHandler(config.DBConnString())
 		if err != nil {
-			log.Println("setupDB error=", err)
+			log.Println("setupDB postgres error=", err)
 			return nil, err
 		}
 		postgresRepo := repository.NewPostgresRepository(postgresHandler)
@@ -49,11 +50,19 @@ func setupDBRepo() (usecases.DBRepository, error) {
 	case "mssql":
 		msHandler, err := handlers.NewMssqlHandler(config.DBConnString())
 		if err != nil {
-			log.Println("setupDB error=", err)
+			log.Println("setupDB mssql error=", err)
 			return nil, err
 		}
 		msRepo := repository.NewMssqlRepository(msHandler)
 		return msRepo, nil
+	case "mysql":
+		myHandler, err := handlers.NewMysqlHandler(config.DBConnString())
+		if err != nil {
+			log.Println("setupDB mysql error=", err)
+			return nil, err
+		}
+		myRepo := repository.NewMysqlRepository(myHandler)
+		return myRepo, nil
 	default:
 		log.Println("setupDB: unknow driver")
 	}

@@ -25,7 +25,8 @@ var (
 func InitVars(cfgType, driver string) error {
 
 	setupLogConfig()
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath("../../config")
+	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 
@@ -47,6 +48,10 @@ func DBConnString() string {
 	case "mssql":
 		return fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d",
 			cfg.host, cfg.user, cfg.password, cfg.port)
+	case "mysql":
+		//user:password@tcp(host:3306)/dbname?charset=utf8
+		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8",
+			cfg.user, cfg.password, cfg.host, cfg.port, cfg.dbname)
 	default:
 
 	}
@@ -90,6 +95,10 @@ func proCfg(driver string) {
 		dbname:   viper.GetString(driver + ".pro_db.dbname"),
 		driver:   driver,
 	}
+	if os.Getenv("PG_HOST") != "" {
+		cfg.host = os.Getenv("PG_HOST")
+	}
+
 	log.Println("pro config:", cfg)
 }
 
@@ -106,8 +115,4 @@ func testCfg(driver string) {
 		driver:   driver,
 	}
 	log.Println("test config:", cfg)
-}
-
-func setupOnDriver(driver string) {
-
 }
