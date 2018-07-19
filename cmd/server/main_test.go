@@ -11,53 +11,61 @@ import (
 	"testing"
 
 	"github.com/gitfuf/userserver/config"
-	//"github.com/gitfuf/userserver/repository"
-	//"github.com/gitfuf/userserver/repository/handlers"
 	"github.com/gitfuf/userserver/usecases"
 )
 
 const userTable = "users"
 
-var app usecases.ServerApp
+var app *usecases.ServerApp
 
+//Test work with REST API and DB repository
 func TestMain(m *testing.M) {
 
 	tests := []struct {
 		name   string
 		driver string
 	}{
+
 		{
-			"postgres tests",
-			"postgres",
+			"mysql tests",
+			"mysql",
 		},
 		{
 			"mssql tests",
 			"mssql",
 		},
+		{
+			"postgres tests",
+			"postgres",
+		},
 	}
+
 	for _, tt := range tests {
 		fmt.Println("Start tests: ", tt.driver)
 		err := config.InitVars("test", tt.driver)
 		if err != nil {
+			fmt.Println(err)
 			os.Exit(1)
 		}
-		app = usecases.ServerApp{}
-
 		dbRepo, err := setupDBRepo()
 		if err != nil {
 			log.Fatal(err)
 		}
-		app.DBRepo = dbRepo
-		app.InitRouter()
+
+		defer dbRepo.CloseDB()
+		//port :=
+		app, err = usecases.NewServer(dbRepo, "")
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		ensureTableExists(userTable)
 
 		m.Run()
 
 		clearTable(userTable)
-	}
 
-	//os.Exit(code)
+	}
 }
 
 func TestUser_New(t *testing.T) {
@@ -320,13 +328,6 @@ func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	return rr
 }
 
-/*
-func checkResponseCode(t *testing.T, expected, actual int) {
-	if expected != actual {
-		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
-	}
-}
-*/
 //DB
 func ensureTableExists(table string) {
 	err := app.DBRepo.CreateTable(table)

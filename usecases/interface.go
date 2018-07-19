@@ -2,9 +2,10 @@ package usecases
 
 type DBRepository interface {
 	UserRepository
+	CloseDB()
+
 	CreateTable(tableName string) error
 	ClearTable(tableName string) error
-	CloseDB()
 }
 
 type UserRepository interface {
