@@ -3,7 +3,7 @@
 package main
 
 import (
-	"fmt"
+	//	"fmt"
 	"log"
 	"os"
 
@@ -14,11 +14,10 @@ import (
 )
 
 func main() {
-	//log.Println("PG_HOST=", os.Getenv("PG_HOST"))
 	err := config.InitVars("pro", "")
 	if err != nil {
-		fmt.Println("err=", err)
-		os.Exit(3)
+		log.Println("InitVars err=", err)
+		os.Exit(1)
 	}
 
 	dbRepo, err := setupDBRepo()
@@ -27,7 +26,7 @@ func main() {
 	}
 	defer dbRepo.CloseDB()
 
-	server, err := usecases.NewServer(dbRepo, ":8080")
+	server, err := usecases.NewServer(dbRepo, port())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,8 +49,14 @@ func main() {
 
 }
 
-func init() {
-
+func port() string {
+	ret := os.Getenv("HTTP_PORT")
+	if ret != "" {
+		return ret
+	}
+	ret = ":" + config.HttpPort()
+	log.Println("port = ", ret)
+	return ret
 }
 
 func setupDBRepo() (usecases.DBRepository, error) {

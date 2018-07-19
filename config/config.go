@@ -38,6 +38,7 @@ func InitVars(cfgType, driver string) error {
 	fmt.Println("Using config file:", viper.ConfigFileUsed())
 
 	setupDBConfig(cfgType, driver)
+
 	return nil
 }
 
@@ -58,6 +59,10 @@ func DBConnString() string {
 	}
 	return ""
 
+}
+
+func HttpPort() string {
+	return viper.GetString("http_port")
 }
 
 func DBDriver() string {
@@ -84,9 +89,20 @@ func setupDBConfig(cfgType, driver string) {
 		fmt.Println("Unknown configuration")
 	}
 }
+
+func dbDriver() string {
+	ret := os.Getenv("DB_DRIVER")
+	if ret == "" {
+		ret = viper.GetString("db_driver")
+	}
+	log.Println("db driver = ", ret)
+	return ret
+}
+
 func proCfg(driver string) {
 	if driver == "" {
-		driver = viper.GetString("db_driver")
+		//db driver can be declared inside Dockerfile or inside config.yaml
+		driver = dbDriver()
 	}
 	cfg = DBConfig{
 		host:     viper.GetString(driver + ".pro_db.host"),
@@ -98,6 +114,12 @@ func proCfg(driver string) {
 	}
 	if os.Getenv("PG_HOST") != "" {
 		cfg.host = os.Getenv("PG_HOST")
+	}
+	if os.Getenv("MYSQL_HOST") != "" {
+		cfg.host = os.Getenv("MYSQL_HOST")
+	}
+	if os.Getenv("MSSQL_HOST") != "" {
+		cfg.host = os.Getenv("MSSQL_HOST")
 	}
 
 	log.Println("pro config:", cfg)
