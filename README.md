@@ -44,10 +44,10 @@ curl -X GET http://localhost:8080/shutdown
 
 ### Table model
 For work is used only one simple table 'users'. Model lookes like: 
-`type User struct {`
-`	ID        int64  `json:"id"``
-`	Age       int    `json:"age"``
-`	FirstName string `json:"first_name"``
-`	LastName  string `json:"last_name"``
-`	Email     string `json:"email"``
-`}`
+type User struct {
+	ID        int64  `json:"id"`
+	Age       int    `json:"age"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+}
