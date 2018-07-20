@@ -24,19 +24,28 @@ docker-compose -f docker-compose.pg.mysql.mssql.yml down
 "http_port": "8080" declare HTTP port want to use for HTTP requests
 
 ### REST API routes:
-used Gorrila Mux library (github.com/gorilla/mux)
+used
+- Gorrila Mux library (github.com/gorilla/mux)
+Process requests with checking id
 
-1)Add new user: "/user"
-curl -X POST http://localhost:8080/user -d '{"age":44,"first_name":"Mark","last_name":"Salt","email":"fuf@fu1.com"}'
+- Http router (github.com/julienschmidt/httprouter)
+Used for others requests where no need to make complex checking logic
+
+- Standart mux from net/http
+Actually this one is used for test purpose. Httprouter can handle this ones also
+using "Content-Type: application/json" for requests and responses
+
+1)Add new user: "/user" 
+curl -H "Content-Type: application/json" -X POST http://localhost:8080/user -d '{"age":44,"first_name":"Mark","last_name":"Salt","email":"fuf@fu1.com"}'
 
 2)Get user info: "/user/{id:[0-9]+}" 
-curl -X GET http://localhost:8080/user/9
+curl -H "Content-Type: application/json" -X GET http://localhost:8080/user/1
 
 3)Update user info: "/user/{id:[0-9]+}" 
-curl http://localhost:8080/user/1 -X PUT -d '{"age":24,"first_name":"Maria","last_name":"Solo","email":"ku@fu3.com"}'
+curl -H "Content-Type: application/json" http://localhost:8080/user/1 -X PUT -d '{"age":24,"first_name":"Maria","last_name":"Solo","email":"ku@fu3.com"}'
 
 4)Delete user: "/user/{id:[0-9]+}" 
-curl -X DELETE http://localhost:8080/user/9
+curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/user/9
 
 5)Also added  "/shutdown" route for remote graceful shutdown. 
 curl -X GET http://localhost:8080/shutdown
@@ -44,6 +53,7 @@ curl -X GET http://localhost:8080/shutdown
 
 ### Table model
 For work is used only one simple table 'users'. Model lookes like: 
+```Go
 type User struct {
 	ID        int64  `json:"id"`
 	Age       int    `json:"age"`
@@ -51,3 +61,4 @@ type User struct {
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 }
+```
