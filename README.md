@@ -56,10 +56,10 @@ using "Content-Type: application/json" for requests and responses
 For work is used only one simple table 'users'. Model lookes like: 
 ```Go
 type User struct {
-	ID        int64  `json:"id"`
-	Age       int    `json:"age"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
+	ID        int64          `json:"id"`
+	Age       sql.NullInt64  `json:"age"`
+	FirstName sql.NullString `json:"first_name"`
+	LastName  sql.NullString `json:"last_name"`
+	Email     string         `json:"email"`
 }
 ```

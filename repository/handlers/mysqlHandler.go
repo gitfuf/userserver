@@ -24,6 +24,13 @@ func NewMysqlHandler(connString string) (*MysqlHandler, error) {
 		log.Println("err=", err)
 		return nil, err
 	}
+	//check really connect to db
+	err = conn.Ping()
+	if err != nil {
+		conn.Close()
+		log.Println("db ping err=", err)
+		return nil, err
+	}
 
 	mysqlHandler := new(MysqlHandler)
 	mysqlHandler.conn = conn
@@ -124,7 +131,7 @@ const myTableUserCreateQuery = `CREATE TABLE IF NOT EXISTS users (
 		age INT NULL DEFAULT NULL,
         first_name VARCHAR(64) NULL DEFAULT NULL,
         last_name VARCHAR(64) NULL DEFAULT NULL,
-        email VARCHAR(64) NULL DEFAULT NULL,
+        email VARCHAR(64) NOT NULL DEFAULT NULL,
         PRIMARY KEY (id)
     );`
 

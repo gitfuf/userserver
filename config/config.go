@@ -52,7 +52,7 @@ func DBConnString() string {
 			cfg.host, cfg.user, cfg.password, cfg.port)
 	case "mysql":
 		//user:password@tcp(host:3306)/dbname?charset=utf8
-		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8",
+		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&interpolateParams=true",
 			cfg.user, cfg.password, cfg.host, cfg.port, cfg.dbname)
 	default:
 

@@ -141,7 +141,7 @@ const pgTableUserCreateQuery = `CREATE TABLE IF NOT EXISTS users
 	age INT,
 	first_name TEXT,
 	last_name TEXT,
-	email TEXT 
+	email TEXT NOT NULL
 )`
 
 func (pgH *PostgresHandler) ClearUserTable() error {

@@ -115,7 +115,7 @@ IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
 	age INT, 
 	first_name NVARCHAR(50), 
 	last_name NVARCHAR(50), 
-	email NVARCHAR(100)
+	email NVARCHAR(100) NOT NULL
 )`
 
 func (msH *MsHandler) ClearUserTable() error {
