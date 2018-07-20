@@ -8,9 +8,10 @@ import (
 	"sync/atomic"
 
 	"github.com/gorilla/mux"
+	"github.com/julienschmidt/httprouter"
 )
 
-func (app *ServerApp) newUser(w http.ResponseWriter, r *http.Request) {
+func (app *ServerApp) newUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	log.Println("ServerApp:newUser route")
 	u := User{}
 	decoder := json.NewDecoder(r.Body)

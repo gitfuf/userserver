@@ -26,14 +26,14 @@ func TestMain(m *testing.M) {
 		driver string
 	}{
 
-		{
-			"mysql tests",
-			"mysql",
-		},
-		{
-			"mssql tests",
-			"mssql",
-		},
+		/*	{
+				"mysql tests",
+				"mysql",
+			},
+			{
+				"mssql tests",
+				"mssql",
+			},*/
 		{
 			"postgres tests",
 			"postgres",
@@ -324,7 +324,8 @@ func TestUser_Get(t *testing.T) {
 // http
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	app.Router.ServeHTTP(rr, req)
+	app.Server.Handler.ServeHTTP(rr, req)
+	log.Println("response body: ", rr.Body)
 	return rr
 }
 

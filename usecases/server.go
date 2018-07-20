@@ -9,16 +9,13 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 type ServerApp struct {
-	Router *mux.Router
 	DBRepo DBRepository
-
-	//for gracefulShutdown
 	http.Server
+
+	//for graceful shutdown
 	shutdownC chan bool
 	reqCount  uint32
 }
@@ -31,17 +28,9 @@ func NewServer(db DBRepository, port string) (*ServerApp, error) {
 		shutdownC: make(chan bool),
 	}
 	srv.DBRepo = db
-	srv.initRouter()
+	srv.initRESTApi()
 
 	return srv, nil
-}
-
-func (app *ServerApp) initRouter() {
-	log.Println("ServerApp:initRouter()")
-	router := mux.NewRouter()
-	app.Router = router
-	app.Server.Handler = router
-	app.initRoutes()
 }
 
 func (app *ServerApp) WaitShutdown() {
