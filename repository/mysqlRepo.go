@@ -2,10 +2,10 @@ package repository
 
 import (
 	"errors"
-	"log"
 
 	"github.com/gitfuf/userserver/repository/handlers"
 	"github.com/gitfuf/userserver/usecases"
+	log "github.com/sirupsen/logrus"
 )
 
 type MysqlRepo struct {
@@ -14,69 +14,68 @@ type MysqlRepo struct {
 }
 
 func NewMysqlRepository(myHandler *handlers.MysqlHandler) usecases.DBRepository {
-	log.Println("call NewMysqlRepository")
+	log.Debug("call NewMysqlRepository")
 	myRepo := new(MysqlRepo)
 	myRepo.myHandler = myHandler
 	return myRepo
 }
 
 func (myRepo *MysqlRepo) GetUserInfo(id int64) (usecases.User, error) {
-	log.Println("MysqlRepo:GetUserInfo begin id=", id)
+	log.Debug("MysqlRepo:GetUserInfo begin id=", id)
 	uM, err := myRepo.myHandler.GetUser(id)
 	u := createUcUser(uM)
-	log.Printf("MysqlRepo:GetUserInfo result user=%v, err=%v\n", u, err)
+	log.Debugf("MysqlRepo:GetUserInfo result user=%v, err=%v\n", u, err)
 	return u, err
 
 }
 
 func (myRepo *MysqlRepo) AddUser(u *usecases.User) error {
-	log.Println("MysqlRepo: AddUser:begin", u)
+	log.Debug("MysqlRepo: AddUser:begin", u)
 
 	uM := createModelUser(*u)
 	err := myRepo.myHandler.InsertUser(&uM)
 	if err != nil {
-		log.Println("MysqlRepo:AddUser err=", err)
+		log.Error("MysqlRepo:AddUser err=", err)
 		return err
 	}
-	//TODO maybe convert func
 	u.ID = uM.ID
-	log.Println("MysqlRepo:AddUser:success =", u)
+	log.Debug("MysqlRepo:AddUser:success =", u)
 	return nil
 }
 
 func (myRepo *MysqlRepo) UpdateUser(u usecases.User) error {
-	log.Println("MysqlRepo:UpdateUser:begin user=", u)
+	log.Debug("MysqlRepo:UpdateUser:begin user=", u)
 	uM := createModelUser(u)
 	err := myRepo.myHandler.UpdateUser(uM)
 	if err != nil {
-		log.Println("MysqlRepo:UpdateUser:error=", err)
+		log.Error("MysqlRepo:UpdateUser:error=", err)
 		return err
 	}
-	log.Println("MysqlRepo:UpdateUser:successful")
+	log.Debug("MysqlRepo:UpdateUser:successful")
 	return nil
 }
 func (myRepo *MysqlRepo) DeleteUser(id int64) error {
-	log.Println("MysqlRepo:DeleteUser:begin id=", id)
+	log.Debug("MysqlRepo:DeleteUser:begin id=", id)
 
 	err := myRepo.myHandler.DeleteUser(id)
 	if err != nil {
-		log.Println("MysqlRepo:DeleteUser:error=", err)
+		log.Error("MysqlRepo:DeleteUser:error=", err)
 		return err
 	}
-	log.Println("MysqlRepo:DeleteUser:successful")
+	log.Debug("MysqlRepo:DeleteUser:successful")
 	return nil
 }
 
 func (myRepo *MysqlRepo) CloseDB() {
 	if err := myRepo.myHandler.CloseDB(); err == nil {
-		log.Printf("MysqlRepo: CloseDB() successful")
+		log.Debug("MysqlRepo: CloseDB() successful")
 	} else {
-		log.Printf("MysqlRepo: CloseDB() err %v\n", err)
+		log.Errorf("MysqlRepo: CloseDB() err %v\n", err)
 	}
 }
 
 func (myRepo *MysqlRepo) CreateTable(table string) error {
-	log.Println("MysqlRepo:CreateTable ", table)
+	log.Debug("MysqlRepo:CreateTable ", table)
 	switch table {
 	case "users":
 		return myRepo.myHandler.CreateUserTable()

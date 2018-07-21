@@ -3,9 +3,9 @@ package repository
 import (
 	"github.com/gitfuf/userserver/repository/models"
 	"github.com/gitfuf/userserver/usecases"
+	log "github.com/sirupsen/logrus"
 
 	"database/sql"
-	"log"
 )
 
 func createModelUser(u usecases.User) models.User {
@@ -35,7 +35,7 @@ func createModelUser(u usecases.User) models.User {
 		Email:     u.Email,
 	}
 
-	log.Printf("createModelUser %v from %v\n", mu, u)
+	log.Debugf("createModelUser %v from %v\n", mu, u)
 	return mu
 }
 
@@ -47,6 +47,6 @@ func createUcUser(u models.User) usecases.User {
 		LastName:  u.LastName.String,
 		Email:     u.Email,
 	}
-	log.Printf("createUcUser %v from %v\n", uc, u)
+	log.Debugf("createUcUser %v from %v\n", uc, u)
 	return uc
 }

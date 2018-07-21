@@ -1,16 +1,18 @@
 package usecases
 
 import (
-	"log"
 	"net/http"
+	"os"
+	"runtime/debug"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/julienschmidt/httprouter"
+	log "github.com/sirupsen/logrus"
 )
 
 func (app *ServerApp) initRESTApi() {
-	log.Println("ServerApp:initRESTApi")
+	log.Debug("ServerApp:initRESTApi")
 
 	//Create gorilla mux for complex requests
 	gorillaRouter := mux.NewRouter()
@@ -26,11 +28,13 @@ func (app *ServerApp) initRESTApi() {
 	//use standart mux for simple requests (actually better to use httprouter, but for test purpose will stay so )
 	stdRouter := http.NewServeMux()
 	stdRouter.HandleFunc("/shutdown", app.serverShutdown)
+	stdRouter.HandleFunc("/panic", app.panicHappen)
 
 	serverMux := http.NewServeMux()
 	serverMux.Handle("/user/", gorillaRouter)
 	serverMux.Handle("/user", httpRouter)
 	serverMux.Handle("/shutdown", stdRouter)
+	serverMux.Handle("/panic", stdRouter)
 
 	//set middleware
 	serverHandler := requestsLogMiddleware(serverMux)
@@ -41,10 +45,11 @@ func (app *ServerApp) initRESTApi() {
 
 func panicMiddleware(mw http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//log.Println("panicMiddleware ", r.URL.Path)
 		defer func() {
 			if err := recover(); err != nil {
-				log.Printf("recovered from error: %v ", err)
+				log.Errorf("recovered from error: %v \n", err)
+				stack := debug.Stack()
+				log.Errorln(string(stack))
 				http.Error(w, http.StatusText(500), 500)
 			}
 		}()
@@ -54,9 +59,19 @@ func panicMiddleware(mw http.Handler) http.Handler {
 
 func requestsLogMiddleware(mw http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("requestsLogMiddleware ", r.URL.Path)
 		start := time.Now()
+		hostname, err := os.Hostname()
+		if err != nil {
+			hostname = "unknown"
+		}
+
 		mw.ServeHTTP(w, r)
-		log.Printf("[%s] %s, %s %s\n", r.Method, r.RemoteAddr, r.URL.Path, time.Since(start))
+		log.WithFields(log.Fields{
+			"url_path":    r.URL.Path,
+			"method":      r.Method,
+			"hostname":    hostname,
+			"remote_addr": r.RemoteAddr,
+			"work_time":   time.Since(start),
+		}).Info("New request:")
 	})
 }

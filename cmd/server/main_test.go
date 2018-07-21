@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
+	//"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -12,6 +12,7 @@ import (
 
 	"github.com/gitfuf/userserver/config"
 	"github.com/gitfuf/userserver/usecases"
+	log "github.com/sirupsen/logrus"
 )
 
 const userTable = "users"
@@ -26,14 +27,14 @@ func TestMain(m *testing.M) {
 		driver string
 	}{
 
-		/*	{
-				"mysql tests",
-				"mysql",
-			},
-			{
-				"mssql tests",
-				"mssql",
-			},*/
+		{
+			"mysql tests",
+			"mysql",
+		},
+		{
+			"mssql tests",
+			"mssql",
+		},
 		{
 			"postgres tests",
 			"postgres",

@@ -3,9 +3,9 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -24,7 +24,7 @@ var (
 
 func InitVars(cfgType, driver string) error {
 
-	setupLogConfig()
+	setupLogrusConfig()
 	viper.AddConfigPath("../../config")
 	viper.AddConfigPath("./config")
 	viper.AddConfigPath(".")
@@ -32,10 +32,12 @@ func InitVars(cfgType, driver string) error {
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Println(err)
+		log.Fatal(err)
 		return err
 	}
-	fmt.Println("Using config file:", viper.ConfigFileUsed())
+	log.WithFields(log.Fields{
+		"config": viper.ConfigFileUsed(),
+	}).Info("Use")
 
 	setupDBConfig(cfgType, driver)
 
@@ -69,24 +71,39 @@ func DBDriver() string {
 	return cfg.driver
 }
 
-func setupLogConfig() {
-	file, err := os.OpenFile("server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+func setupLogrusConfig() {
+	file, err := os.OpenFile("server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatal("Failed to open log file :", err)
 	}
 
 	log.SetOutput(file)
+
+	log.SetFormatter(&log.TextFormatter{
+		TimestampFormat: "2006-01-02T15:04:05.000",
+		FullTimestamp:   true,
+		//	DisableTimestamp: false,
+	})
+	if os.Getenv("LOG_LEVEL") != "" {
+		l := os.Getenv("LOG_LEVEL")
+		lvl, err := log.ParseLevel(l)
+		if err == nil {
+			log.SetLevel(lvl)
+		}
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
 }
 
 func setupDBConfig(cfgType, driver string) {
-	log.Printf("setupDBConfig type=%s, driver=%s", cfgType, driver)
+	log.Debugf("setupDBConfig type=%s, driver=%s", cfgType, driver)
 	switch cfgType {
 	case "pro":
 		proCfg(driver)
 	case "test":
 		testCfg(driver)
 	default:
-		fmt.Println("Unknown configuration")
+		log.Warning("Unknown configuration: ", cfgType)
 	}
 }
 
@@ -95,7 +112,7 @@ func dbDriver() string {
 	if ret == "" {
 		ret = viper.GetString("db_driver")
 	}
-	log.Println("db driver = ", ret)
+	log.Info("Using database driver = ", ret)
 	return ret
 }
 
@@ -122,7 +139,7 @@ func proCfg(driver string) {
 		cfg.host = os.Getenv("MSSQL_HOST")
 	}
 
-	log.Println("pro config:", cfg)
+	log.Debug("pro config:", cfg)
 }
 
 func testCfg(driver string) {
@@ -137,5 +154,5 @@ func testCfg(driver string) {
 		dbname:   viper.GetString(driver + ".test_db.dbname"),
 		driver:   driver,
 	}
-	log.Println("test config:", cfg)
+	log.Debug("test config:", cfg)
 }

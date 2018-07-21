@@ -5,7 +5,6 @@ In order to run server:
 go run ./cmd/server/main.go
 
 Configuration is made through config/config.yaml:
-
 ### DB configuration
 "db_driver": "postgres" if want use Postgresql
 "db_driver": "mssql" if want use MSSQL
@@ -22,6 +21,13 @@ docker-compose -f docker-compose.pg.mysql.mssql.yml down
 
 ### HTTP configuration
 "http_port": "8080" declare HTTP port want to use for HTTP requests
+
+### Log configuration
+Uses Logrus (github.com/sirupsen/logrus). Declared as 
+`import log "github.com/sirupsen/logrus"` because initially was used standart log
+****Default**** log level is ****INFO****
+In order to run debug mode is used environment variable __LOG_LEVEL__
+E.g.:'`LOG_LEVEL=debug go run ./cmd/server/main.go`
 
 ### REST API routes:
 used

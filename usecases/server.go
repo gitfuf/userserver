@@ -3,12 +3,13 @@ package usecases
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type ServerApp struct {
@@ -40,12 +41,12 @@ func (app *ServerApp) WaitShutdown() {
 	//Wait interrupt or shutdown request through /shutdown
 	select {
 	case sig := <-irqSig:
-		log.Printf("Shutdown request (signal: %v)", sig)
+		log.Debugf("Shutdown request (signal: %v)", sig)
 	case sig := <-app.shutdownC:
-		log.Printf("Shutdown request (/shutdown %v)", sig)
+		log.Debugf("Shutdown request (/shutdown %v)", sig)
 	}
 
-	log.Printf("Stoping http server ...")
+	log.Info("Stoping http server ...")
 
 	//Create shutdown context with 10 second timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -54,6 +55,6 @@ func (app *ServerApp) WaitShutdown() {
 	//shutdown the server
 	err := app.Shutdown(ctx)
 	if err != nil {
-		log.Printf("Shutdown request error: %v", err)
+		log.Warn("Shutdown request error: %v", err)
 	}
 }

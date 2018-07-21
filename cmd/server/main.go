@@ -3,9 +3,9 @@
 package main
 
 import (
-	//	"fmt"
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gitfuf/userserver/config"
 	"github.com/gitfuf/userserver/repository"
@@ -16,8 +16,7 @@ import (
 func main() {
 	err := config.InitVars("pro", "")
 	if err != nil {
-		log.Println("InitVars err=", err)
-		os.Exit(1)
+		log.Fatal("InitVars err=", err)
 	}
 
 	dbRepo, err := setupDBRepo()
@@ -33,10 +32,10 @@ func main() {
 
 	done := make(chan bool)
 	go func() {
-		log.Println("Run ListenAndServe()")
+		log.Debug("Run ListenAndServe()")
 		err := server.ListenAndServe()
 		if err != nil {
-			log.Printf("Listen and serve: %v", err)
+			log.Warnf("Listen and serve: %v", err)
 		}
 		done <- true
 	}()
@@ -45,7 +44,11 @@ func main() {
 	server.WaitShutdown()
 
 	<-done
-	log.Println("Server was graceful shutdown")
+	log.Info("Server was graceful shutdown")
+
+}
+
+func init() {
 
 }
 
@@ -55,7 +58,7 @@ func port() string {
 		return ret
 	}
 	ret = ":" + config.HttpPort()
-	log.Println("port = ", ret)
+	log.Debug("port = ", ret)
 	return ret
 }
 
@@ -64,7 +67,7 @@ func setupDBRepo() (usecases.DBRepository, error) {
 	case "postgres":
 		postgresHandler, err := handlers.NewPostgresHandler(config.DBConnString())
 		if err != nil {
-			log.Println("setupDB postgres error=", err)
+			log.Warn("setupDB postgres error=", err)
 			return nil, err
 		}
 		postgresRepo := repository.NewPostgresRepository(postgresHandler)
@@ -72,7 +75,7 @@ func setupDBRepo() (usecases.DBRepository, error) {
 	case "mssql":
 		msHandler, err := handlers.NewMssqlHandler(config.DBConnString())
 		if err != nil {
-			log.Println("setupDB mssql error=", err)
+			log.Warn("setupDB mssql error=", err)
 			return nil, err
 		}
 		msRepo := repository.NewMssqlRepository(msHandler)
@@ -80,13 +83,13 @@ func setupDBRepo() (usecases.DBRepository, error) {
 	case "mysql":
 		myHandler, err := handlers.NewMysqlHandler(config.DBConnString())
 		if err != nil {
-			log.Println("setupDB mysql error=", err)
+			log.Warn("setupDB mysql error=", err)
 			return nil, err
 		}
 		myRepo := repository.NewMysqlRepository(myHandler)
 		return myRepo, nil
 	default:
-		log.Println("setupDB: unknow driver")
+		log.Warn("setupDB: unknow driver")
 	}
 	return nil, nil
 
