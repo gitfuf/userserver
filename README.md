@@ -23,10 +23,15 @@ docker-compose -f docker-compose.pg.mysql.mssql.yml down
 "http_port": "8080" declare HTTP port want to use for HTTP requests
 
 ### Log configuration
-Uses Logrus (github.com/sirupsen/logrus). Declared as 
-`import log "github.com/sirupsen/logrus"` because initially was used standart log
-****Default**** log level is ****INFO****
-In order to run debug mode is used environment variable __LOG_LEVEL__
+Uses Logrus (github.com/sirupsen/logrus). 
+Declared as
+```
+import log "github.com/sirupsen/logrus"
+```
+because initially was used standart log
+
+**Default** log level is **INFO**
+In order to run debug mode is used environment variable _LOG_LEVEL_
 E.g.:'`LOG_LEVEL=debug go run ./cmd/server/main.go`
 
 ### REST API routes:
@@ -43,18 +48,23 @@ using "Content-Type: application/json" for requests and responses
 
 *Examples with using `curl`*
 * **Add new user**: "/user" 
+
 `curl -H "Content-Type: application/json" -X POST http://localhost:8080/user -d '{"age":44,"first_name":"Mark","last_name":"Salt","email":"fuf@fu1.com"}'`
 
 * **Get user info**: "/user/{id:[0-9]+}"
+
 `curl -H "Content-Type: application/json" -X GET http://localhost:8080/user/1`
 
 * **Update user info**: "/user/{id:[0-9]+}"
+
 `curl -H "Content-Type: application/json" http://localhost:8080/user/1 -X PUT -d '{"age":24,"first_name":"Maria","last_name":"Solo","email":"ku@fu3.com"}'`
 
 * **Delete user**: "/user/{id:[0-9]+}" 
+
 `curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/user/1`
 
 * Also added **"/shutdown"** route for remote graceful shutdown. 
+
 `curl -X GET http://localhost:8080/shutdown`
 
 
