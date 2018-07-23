@@ -30,9 +30,12 @@ import log "github.com/sirupsen/logrus"
 ```
 because initially was used standart log
 
-**Default** log level is **INFO**
-In order to run debug mode is used environment variable _LOG_LEVEL_
-E.g.:'`LOG_LEVEL=debug go run ./cmd/server/main.go`
+Can setup using flags:
+```
+logName := flag.String("logname", "server.log", "log file name")
+logLevel := flag.String("loglvl", "info", "log level can be: info, debug, error")
+logType := flag.String("logtype", "pro", "log has three type: pro (to JSON), dev (to TTY), debug (to text file)")
+```
 
 ### REST API routes:
 used
