@@ -2,6 +2,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -72,12 +73,32 @@ func DBDriver() string {
 }
 
 func setupLogrusConfig() {
-	file, err := os.OpenFile("server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	logName := flag.String("logname", "server.log", "log file name")
+	logLevel := flag.String("loglvl", "info", "log level can be: info, debug, error")
+	logType := flag.String("logtype", "pro", "log has three type: pro (to JSON), dev (to TTY), debug (to text file)")
+	flag.Parse()
+	fmt.Printf("flags: %s, %s, %s", *logName, *logType, *logLevel)
+
+	setupLogFormatter(*logType)
+	lvl, err := log.ParseLevel(*logLevel)
+	if err == nil {
+		log.SetLevel(lvl)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+
+	if *logType == "dev" {
+		return
+	}
+
+	file, err := os.OpenFile(*logName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		log.Fatal("Failed to open log file :", err)
+		log.Fatal("Failed to open", *logName, " :", err)
 	}
 
 	log.SetOutput(file)
+
+	/*setupLogFormatter(*logType)
 
 	log.SetFormatter(&log.TextFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.000",
@@ -92,6 +113,29 @@ func setupLogrusConfig() {
 		}
 	} else {
 		log.SetLevel(log.InfoLevel)
+	}
+	*/
+}
+
+func setupLogFormatter(logType string) {
+	switch logType {
+	case "pro":
+		log.SetFormatter(&log.JSONFormatter{
+			TimestampFormat: "2006-01-02T15:04:05.000",
+		})
+	case "dev":
+		log.SetFormatter(&log.TextFormatter{
+			TimestampFormat: "2006-01-02T15:04:05.000",
+			FullTimestamp:   true,
+			//	DisableTimestamp: false,
+		})
+	case "debug":
+		log.SetFormatter(&log.TextFormatter{
+			TimestampFormat: "2006-01-02T15:04:05.000",
+			FullTimestamp:   true,
+			//	DisableTimestamp: false,
+		})
+
 	}
 }
 
