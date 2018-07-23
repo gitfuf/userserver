@@ -23,9 +23,8 @@ var (
 	cfg DBConfig
 )
 
-func InitVars(cfgType, driver string) error {
+func InitConfiguration(cfgType, driver string) error {
 
-	setupLogrusConfig()
 	viper.AddConfigPath("../../config")
 	viper.AddConfigPath("./config")
 	viper.AddConfigPath(".")
@@ -72,13 +71,13 @@ func DBDriver() string {
 	return cfg.driver
 }
 
-func setupLogrusConfig() {
+func InitLog() *os.File {
 	logName := flag.String("logname", "server.log", "log file name")
 	logLevel := flag.String("loglvl", "info", "log level can be: info, debug, error")
 	logType := flag.String("logtype", "pro", "log has three type: pro (to JSON), dev (to TTY), debug (to text file)")
 	flag.Parse()
-	fmt.Printf("flags: %s, %s, %s", *logName, *logType, *logLevel)
 
+	log.Debugf("flags: %s, %s, %s", *logName, *logType, *logLevel)
 	setupLogFormatter(*logType)
 	lvl, err := log.ParseLevel(*logLevel)
 	if err == nil {
@@ -88,7 +87,7 @@ func setupLogrusConfig() {
 	}
 
 	if *logType == "dev" {
-		return
+		return nil
 	}
 
 	file, err := os.OpenFile(*logName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
@@ -97,6 +96,7 @@ func setupLogrusConfig() {
 	}
 
 	log.SetOutput(file)
+	return file
 }
 
 func setupLogFormatter(logType string) {

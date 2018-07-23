@@ -35,12 +35,12 @@ func NewServer(db DBRepository, port string) (*ServerApp, error) {
 }
 
 func (app *ServerApp) WaitShutdown() {
-	irqSig := make(chan os.Signal, 1)
-	signal.Notify(irqSig, syscall.SIGINT, syscall.SIGTERM)
+	sigC := make(chan os.Signal, 1)
+	signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
 
 	//Wait interrupt or shutdown request through /shutdown
 	select {
-	case sig := <-irqSig:
+	case sig := <-sigC:
 		log.Debugf("Shutdown request (signal: %v)", sig)
 	case sig := <-app.shutdownC:
 		log.Debugf("Shutdown request (/shutdown %v)", sig)

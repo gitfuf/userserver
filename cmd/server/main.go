@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -14,20 +15,30 @@ import (
 )
 
 func main() {
-	err := config.InitVars("pro", "")
+	logfile := config.InitLog()
+
+	//close log file at the app exit
+	defer func() {
+		fmt.Println("Close log file: ", logfile.Name())
+		logfile.Sync()
+		logfile.Close()
+	}()
+
+	err := config.InitConfiguration("pro", "")
 	if err != nil {
-		log.Fatal("InitVars err=", err)
+		log.Fatal("InitConfiguration err=", err)
 	}
 
 	dbRepo, err := setupDBRepo()
 	if err != nil {
-		log.Fatal(err)
+		log.Error("Setup new DB repository err: ", err)
+		return
 	}
 	defer dbRepo.CloseDB()
 
 	server, err := usecases.NewServer(dbRepo, port())
 	if err != nil {
-		log.Fatal(err)
+		log.Error("Create new server err: ", err)
 	}
 
 	done := make(chan bool)
@@ -45,10 +56,6 @@ func main() {
 
 	<-done
 	log.Info("Server was graceful shutdown")
-
-}
-
-func init() {
 
 }
 
