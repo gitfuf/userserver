@@ -97,24 +97,6 @@ func setupLogrusConfig() {
 	}
 
 	log.SetOutput(file)
-
-	/*setupLogFormatter(*logType)
-
-	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: "2006-01-02T15:04:05.000",
-		FullTimestamp:   true,
-		//	DisableTimestamp: false,
-	})
-	if os.Getenv("LOG_LEVEL") != "" {
-		l := os.Getenv("LOG_LEVEL")
-		lvl, err := log.ParseLevel(l)
-		if err == nil {
-			log.SetLevel(lvl)
-		}
-	} else {
-		log.SetLevel(log.InfoLevel)
-	}
-	*/
 }
 
 func setupLogFormatter(logType string) {
